@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
---[[*<= Version '20180916c' =>*]]
+--[[*<= Version '20180917a' =>*]]
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -399,10 +399,10 @@ local function intro_stranka()
 	end
 	add("(p)Matix je online aplikace pro výuku základní matematiky (4 operace, úpravy zlomků) pro děti od 7. třídy dále. S překvapením jsem zjistil, že podobná online aplikace neexistuje, tak jsem ji narychlo spíchl sám (děti nemám, bylo to pro cizí dítě).")
 	add('(p)Zkuste si (ahref "index--demo.htm")demo(/a) a pravděpodobně všechno pochopíte. Dítě dostává nabídku z 5 příkladů (různě obodovaných podle obtížnosti). Jakmile jeden z nich správně vyřeší, o trošičku se zvýší obtížnost a je vygenerováno 5 dalších. Pokud neumí vyřešit ani jeden, kliknutím na link pod 5 příklady může obtížnost snížit. Kliknutím na "historie" se zobrazí co přesně kdy dítě řešilo, a jestli bylo úspěšné. To je určeno pro rodiče. Takže můžete např. dítěti přikázat "dnes udělej správně 10 příkladů" nebo "dnes udělej správně příklady za 200 bodů" a pak to zkontrolovat.')
-	add('(p)Založení účtu pro vaše dítě: Podívejte se na URL dema v předchozím odstavci. Místo řetězce "demo" tam vložte unikátní řetězec pro vaše dítě. Tedy například "karlik9210666". Pokud použijete pouze "karlik", je vysoce pravděpodobné, že totéž jméno použije později někdo jiný a dostane se na váš účet. Žádná autentifikace neexistuje.')
+	add('(p)Založení účtu pro vaše dítě: Podívejte se na URL dema v předchozím odstavci. Místo řetězce "demo" tam vložte unikátní řetězec pro vaše dítě. Tedy například "karlik9210666". Výsledné URL (v tomto případě (b)www.fuxoft.cz/vyplody/matix/index--karlik9210666.htm(/b)) zabookmarkujete svému dítěti. Pokud použijete pouze "karlik", je vysoce pravděpodobné, že totéž jméno použije později někdo jiný a dostane se na váš účet. Žádná autentifikace neexistuje.')
 	add('(p)(ahref "index.htm?test=jo")Zde(/a) je k dispozici stránka, která vygeneruje 100 náhodných příkladů (včetně řešení) s (přibližně) rostoucí obtížností - abyste viděli, o jaký typ příkladů jde.')
-	add('(p)Neaktivní uživatelé se po nějaké době dnech mažou.')
-	add('(p)Zdrojáky budou záhy k dispozici zde.')
+	add('(p)Neaktivní uživatelé se po nějaké době mažou.')
+	add('(p)Zdrojáky jsou k dispozici (ahref="https://github.com/fuxoft/matix")zde(/a).')
 	return table.concat(pr0)
 end
 
