@@ -1,0 +1,5 @@
+#!/bin/bash
+
+find /home/fuxoft/appdata/matix/cache -maxdepth 1 -type f -mtime +8 -delete
+find /home/fuxoft/appdata/matix/users -maxdepth 1 -type f -mtime +32 -delete
+touch /home/fuxoft/appdata/matix/last_cleanup_timestamp

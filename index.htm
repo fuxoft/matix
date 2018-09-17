@@ -1,0 +1,27 @@
+--LUASCRIPT
+_G.DIR = {base = "/home/fuxoft/work/web/fuxoft.cz/vyplody/matix/"}
+local result, title = dofile(DIR.base.."main.lua")
+FFTEMPL.add_dumb_tag("MATIX_CONTENT", result)
+FFTEMPL.add_dumb_tag("TITLE_CONTENT", title)
+--/LUASCRIPT
+((TITLE))
+TITLE_CONTENT
+((HEAD))
+<STYLE TYPE="text/css">
+div.gplus a {text-decoration:none;}
+div.gplus_stream_item { margin-top:5px; margin-bottom:10px; padding-top:10px; border-top:2px dotted; border-color:#c6ff00}
+div.gplus_stream_title {font-style:italic;}
+div.gplus_article_name {font-weight:bold}
+div.gplus_annotation {font-size:80%;}
+div.gplus_article_content {font-size:80%;}
+img.gplus_article_image {border-style:solid;border-width:1px; margin-top:2px; margin-bottom:2px;}
+div.gplus_article_replies {text-align:right}
+</STYLE>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+
+    onload="renderMathInElement(document.body, {throwOnError: false, errorColor: '#f44'});"></script>
+((BODY))
+(h1)MATIX - škola hrou(/h1)
+MATIX_CONTENT
