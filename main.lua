@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
---[[*<= Version '20180917b' =>*]]
+--[[*<= Version '20180917c' =>*]]
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end

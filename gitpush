@@ -1,0 +1,13 @@
+#!/usr/bin/env luajit
+
+local exe = function(str)
+	os.execute(str)
+end
+
+local fd = io.popen("autoversion --show-only main.lua")
+local version = fd:read("*a")
+fd:close()
+local command = "git commit -a -m 'Verze "..version.."'"
+exe(command)
+local command = "git push"
+exe(command)
