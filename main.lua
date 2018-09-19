@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
-_G.VERZE = ([[*<= Version '20180917c' =>*]]):match("'(.*)'")
+_G.VERZE = ([[*<= Version '20180919a' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -536,7 +536,7 @@ local function resit_priklad(id)
 	else
 		if aktivni then
 			if priklad.reseni.tex_float then
-				add("Vypočti následující výraz. Výsledek zadej jako celé nebo desetinné číslo ((b)nikoliv zlomek(/b)).")
+				add("Vypočti následující výraz. Výsledek zadej jako (b)celé nebo desetinné(/b) číslo (ne zlomek).")
 			else
 				add("Vypočti následující výraz. Pokud to jde, převeď výsledek na zlomek v základním tvaru a na smíšené číslo.")
 			end
@@ -602,7 +602,7 @@ local function resit_priklad(id)
 				<input type="hidden" name="priklad" value="%s">
 				(b)Zadej výsledek:(/b) <input type="text" size="6" name="cislo" value="">&nbsp;&nbsp;&nbsp;
 				<input type="submit" value="ODESLAT">
-				<br>Výsledek zadej jako celé nebo desetinné číslo ((b)nikoliv zlomek(/b)).
+				<br>Výsledek zadej jako celé nebo desetinné číslo (ne zlomek).
 				</form>
 				]], HTML.home(), priklad.id))
 		else
