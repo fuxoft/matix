@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
---[[*<= Version '20180917c' =>*]]
+_G.VERZE = ([[*<= Version '20180917c' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -274,6 +274,10 @@ local function zakladni_tvar_tex(c)
 	return res
 end
 
+local function reseni_prikladu_tex(priklad)
+	return priklad.reseni.tex_float or priklad.reseni.tex
+end
+
 local function priklad(diff, seed)
 	if not seed then
 		seed = HASH_RANDOM.random_string(random, 10).."_"..diff
@@ -344,6 +348,11 @@ local function priklad(diff, seed)
 	local r = vypocti(res.zadani)
 	local x,y,z, float = zakladni_tvar(r)
 	local reseni = {x=x, y=y, z=z, float = float, tex = zakladni_tvar_tex(r), objekt = r}
+	if #(tostring(float):match("%.(.+)") or "xxxxxxxxxxxxxxxxx") <= 3 then
+		reseni.tex_float = tostringcz(float) --Reseni je desetinne, ne zlomek
+	elseif not (y or z) and rnd()>.5 then --Reseni je cele cislo a chceme ho zadat jako desetinne (do jednoho policka misto 3)
+		reseni.tex_float = tostringcz(x)
+	end
 	res.reseni = reseni
 	return res
 end
@@ -397,12 +406,12 @@ local function intro_stranka()
 	local add = function(str)
 		table.insert(pr0, str)
 	end
-	add("(p)Matix je online aplikace pro výuku základní matematiky (4 operace, úpravy zlomků) pro děti od 7. třídy dále. S překvapením jsem zjistil, že podobná online aplikace neexistuje, tak jsem ji narychlo spíchl sám (děti nemám, bylo to pro cizí dítě).")
-	add('(p)Zkuste si (ahref "index--demo.htm")demo(/a) a pravděpodobně všechno pochopíte. Dítě dostává nabídku z 5 příkladů (různě obodovaných podle obtížnosti). Jakmile jeden z nich správně vyřeší, o trošičku se zvýší obtížnost a je vygenerováno 5 dalších. Pokud neumí vyřešit ani jeden, kliknutím na link pod 5 příklady může obtížnost snížit. Kliknutím na "historie" se zobrazí co přesně kdy dítě řešilo, a jestli bylo úspěšné. To je určeno pro rodiče. Takže můžete např. dítěti přikázat "dnes udělej správně 10 příkladů" nebo "dnes udělej správně příklady za 200 bodů" a pak to zkontrolovat.')
+	add("(p)Matix (aktuální verze (b)"..VERZE.."(/b)) je online aplikace pro výuku základní matematiky (4 operace, úpravy zlomků) pro děti od 7. třídy dále. S překvapením jsem zjistil, že podobná online aplikace neexistuje, tak jsem ji narychlo spíchl sám (děti nemám, bylo to pro cizí dítě).")
+	add('(p)Zkuste si (ahref "index--demo.htm")demo(/a) a pravděpodobně všechno pochopíte. Dítě dostává nabídku z 5 příkladů (různě obodovaných podle obtížnosti). Jakmile jeden z nich správně vyřeší, o trošičku se zvýší obtížnost a je vygenerováno 5 dalších. Pokud neumí vyřešit ani jeden, kliknutím na link pod 5 příklady může obtížnost snížit. Kliknutím na "historie" se zobrazí co přesně kdy dítě řešilo, a jestli bylo úspěšné. To je určeno pro rodiče. Takže můžete např. dítěti přikázat "dnes udělej správně 10 příkladů" nebo "dnes udělej správně příklady za 200 bodů" nebo "dnes se dostaň aspoň na obtížnost 0.15" a pak to zkontrolovat.')
 	add('(p)Založení účtu pro vaše dítě: Podívejte se na URL dema v předchozím odstavci. Místo řetězce "demo" tam vložte unikátní řetězec pro vaše dítě. Tedy například "karlik9210666". Výsledné URL (v tomto případě (b)www.fuxoft.cz/vyplody/matix/index--karlik9210666.htm(/b)) zabookmarkujete svému dítěti. Pokud použijete pouze "karlik", je vysoce pravděpodobné, že totéž jméno použije později někdo jiný a dostane se na váš účet. Žádná autentifikace neexistuje. Uživatelská jména mohou obsahovat (b)pouze malá písmena a číslice(/b).')
 	add('(p)(ahref "index.htm?test=jo")Zde(/a) je k dispozici stránka, která vygeneruje 100 náhodných příkladů (včetně řešení) s (přibližně) rostoucí obtížností - abyste viděli, o jaký typ příkladů jde.')
 	add('(p)Neaktivní uživatelé se po nějaké době mažou.')
-	add('(p)Zdrojáky jsou k dispozici (ahref="https://github.com/fuxoft/matix")zde(/a).')
+	add('(p)Zdrojáky jsou k dispozici (ahref "https://github.com/fuxoft/matix")zde(/a).')
 	return table.concat(pr0)
 end
 
@@ -420,13 +429,15 @@ local function main_test()
 		local seed = prefix.."_"..dif
 		--local dif, id = 0.45, "kivIhbVY4n_0.45"
 		local pr = priklad(dif, seed)
-		local sol, float = pr.reseni.tex, pr.reseni.float
+		local sol, float = pr.reseni.tex, pr.reseni.tex_float
 		add("(p)seed: "..pr.seed..", ")
 		add("bodu="..pr.body..", ")
 		add("<font size=+2>$$")
-		add(pr.zadani.render.."=\\textcolor{white}{"..sol.."}")
-		if float and #tostring(float):match("%.(.+)") <= 3 then
-			add("=\\textcolor{white}{"..tostringcz(float).."}")
+		add(pr.zadani.render)
+		if float then
+			add("=\\textcolor{white}{"..float.."}")
+		else
+			add("=\\textcolor{white}{"..sol.."}")
 		end
 		add("$$</font>")
 		add("<code>")
@@ -482,6 +493,7 @@ local function resit_priklad(id)
 		str = str:gsub("%a", "")
 		str = str:gsub("\\", "")
 		str = str:gsub("%.", ",")
+		str = str:gsub(",", "{,}")
 		return str
 	end
 	if args.citatel or args.jmenovatel or args.cislo then
@@ -504,7 +516,7 @@ local function resit_priklad(id)
 			if cit then
 				zadal.render = zadal.render .. string.format("\\frac{%s}{%s}", cit, jm)
 			end
-			if zadal.render == priklad.reseni.tex then
+			if zadal.render == reseni_prikladu_tex(priklad) then
 				zadal.spravne = true
 			end
 		else
@@ -523,19 +535,24 @@ local function resit_priklad(id)
 		end
 	else
 		if aktivni then
-			add("Vypočti následující výraz. Pokud to jde, převeď výsledek na zlomek v základním tvaru a na smíšené číslo.")
+			if priklad.reseni.tex_float then
+				add("Vypočti následující výraz. Výsledek zadej jako celé nebo desetinné číslo ((b)nikoliv zlomek(/b)).")
+			else
+				add("Vypočti následující výraz. Pokud to jde, převeď výsledek na zlomek v základním tvaru a na smíšené číslo.")
+			end
 		else
 			add("Tento příklad už není v aktivní nabídce. Jeho správné řešení bylo:")
 		end
 	end
 	if DEBUG then
-		add("<br>Reseni: "..priklad.reseni.tex)
+		add("<br>Reseni: "..reseni_prikladu_tex(priklad))
+		add("<br>"..SERIALIZE.serialize(priklad))
 	end
 	add("<font size = +3>")
 	add("$$")
 	add(priklad.zadani.render)
 	if not aktivni and not zadal then
-		add("= \\textcolor{white}{"..priklad.reseni.tex.."}")
+		add("= \\textcolor{white}{"..reseni_prikladu_tex(priklad).."}")
 	end
 	if zadal then
 		add("\\color{white}= "..zadal.render)
@@ -579,16 +596,27 @@ local function resit_priklad(id)
 			end
 		end
 	elseif aktivni then
-		add(string.format(
-		[[<form align="center" action="%s" method="get">
-		<input type="hidden" name="priklad" value="%s">
-		(b)Zadej výsledek:(/b) Celé číslo: <input type="text" size="6" name="cislo" value="">&nbsp;&nbsp;&nbsp;
-		Čitatel: <input type="text" size="6" name="citatel" value="">&nbsp;&nbsp;&nbsp;
-		Jmenovatel: <input type="text" size="6" name="jmenovatel" value="">&nbsp;&nbsp;&nbsp;
-		<input type="submit" value="ODESLAT">
-		<br>Pokud je výsledek celé číslo, vyplň pouze první políčko. Pokud je výsledek smíšené číslo, vyplň všechna tři políčka. Čitatel musí být (b)menší než jmenovatel(/b) a jmenovatel (b)nesmí být záporný(/b).
-		</form>
-		]], HTML.home(), priklad.id))
+		if priklad.reseni.tex_float then
+			add(string.format(
+				[[<form align="center" action="%s" method="get">
+				<input type="hidden" name="priklad" value="%s">
+				(b)Zadej výsledek:(/b) <input type="text" size="6" name="cislo" value="">&nbsp;&nbsp;&nbsp;
+				<input type="submit" value="ODESLAT">
+				<br>Výsledek zadej jako celé nebo desetinné číslo ((b)nikoliv zlomek(/b)).
+				</form>
+				]], HTML.home(), priklad.id))
+		else
+			add(string.format(
+			[[<form align="center" action="%s" method="get">
+			<input type="hidden" name="priklad" value="%s">
+			(b)Zadej výsledek:(/b) Celé číslo: <input type="text" size="6" name="cislo" value="">&nbsp;&nbsp;&nbsp;
+			Čitatel: <input type="text" size="6" name="citatel" value="">&nbsp;&nbsp;&nbsp;
+			Jmenovatel: <input type="text" size="6" name="jmenovatel" value="">&nbsp;&nbsp;&nbsp;
+			<input type="submit" value="ODESLAT">
+			<br>Pokud je výsledek celé číslo, vyplň pouze první políčko. Pokud je výsledek smíšené číslo, vyplň všechna tři políčka. Čitatel musí být (b)menší než jmenovatel(/b) a jmenovatel (b)nesmí být záporný(/b).
+			</form>
+			]], HTML.home(), priklad.id))
+		end
 	end
 	add(HTML.home("(p)Zpět na hlavní stránku"))
 	if zadal and zadal.spravne then
@@ -690,7 +718,7 @@ local function main()
 		user_log(txt)
 	end
 
-	add("Uživatel: "..USER.id)
+	add("Uživatel: (b)"..USER.id.."(/b)")
 	add(" / Obtížnost: "..USER.obtiznost)
 	add(string.format(' / Zobrazit (ahref "%s")historii(/a)', HTML.home().."historie=1"))
 	add(" / Dnes jsi získal (b)"..dnesni_body().."(/b) bodů")
