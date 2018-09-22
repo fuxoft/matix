@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
-_G.VERZE = ([[*<= Version '20180919a' =>*]]):match("'(.*)'")
+_G.VERZE = ([[*<= Version '20180922a' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -709,13 +709,17 @@ local function main()
 	if USER and FFTEMPL.args.jednodussi == "takjo" then
 		local sub = 0.005
 		USER.obtiznost = USER.obtiznost - sub
+		local prs = {}
+		for i,priklad in ipairs(USER.priklady) do
+			table.insert(prs, string.format('(ahref "%s")%s(/a)', HTML.priklad(priklad.id), priklad.id))
+		end
 		USER.priklady = nil
 		if USER.obtiznost < 0 then
 			USER.obtiznost = 0
 		end
-		local txt = "***** Obtížnost snížena o "..sub.." na "..USER.obtiznost.." *****"
+		local txt = "***** Obtížnost snížena o "..sub.." na "..USER.obtiznost.."."
 		add("(b)"..txt.."(/b)(p)")
-		user_log(txt)
+		user_log(txt.." Aktivní příklady byly: "..table.concat(prs,", ")..".")
 	end
 
 	add("Uživatel: (b)"..USER.id.."(/b)")
