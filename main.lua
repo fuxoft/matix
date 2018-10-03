@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
-_G.VERZE = ([[*<= Version '20180922a' =>*]]):match("'(.*)'")
+_G.VERZE = ([[*<= Version '20180923a' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -344,6 +344,9 @@ local function priklad(diff, seed)
 	assert(#vyrazy == 1)
 	local res = {zadani = assert(vyrazy[1]), obtiznost = extradif + diff, seed = seed}
 	res.body = math.floor(res.obtiznost ^ 1.5 * 90) + 10
+	if not res.zadani.render:match("frac") then
+		res.body = math.floor(res.body / 2)
+	end
 	res.id = os.date("%m%d_%H%M_")..HASH_RANDOM.random_string(rnd, 4)
 	local r = vypocti(res.zadani)
 	local x,y,z, float = zakladni_tvar(r)
@@ -563,7 +566,7 @@ local function resit_priklad(id)
 		if zadal.spravne then
 			add("<font color=white>😉 SPRÁVNĚ! 😉")
 		else
-			msg = "Neúspěšné"
+			msg = "(b)Neúspěšné(/b)"
 			add("<font color=red>NESPRÁVNÉ ŘEŠENÍ")
 		end
 		add("</font>")
