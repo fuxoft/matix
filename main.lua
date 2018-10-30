@@ -734,13 +734,13 @@ local function main()
 		local prikladu, diffstep = 5, 0.05
 		for i = 1, prikladu do
 			local pr = priklad(USER.obtiznost + (i-1)*diffstep)
-			SERIALIZE.save(pr, DIR.cache .. pr.id .. ".lua")
 			table.insert(USER.priklady, pr)
 		end
 		table.sort(USER.priklady, function (a,b) return a.body < b.body end)
 	end
 
 	for i, priklad in ipairs(USER.priklady) do
+		SERIALIZE.save(priklad, DIR.cache .. priklad.id .. ".lua") --Priklady se ukladaji na disk pri KAZDEM zobrazeni hlavni stranky, aby bylo mozne se vratit k aktivnim prikladum i po hodne dlouhe dobe (kdyz je cache smazana)
 		add("(h3)Příklad "..string.char(64+i).." za "..priklad.body.." bodů:(/h3)")
 		add("<font size=+2>$$")
 		add(priklad.zadani.render)
