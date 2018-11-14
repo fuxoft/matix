@@ -40,6 +40,9 @@ local function init()
 			user_log("Uživatel "..id.." založen")
 		end
 		SERIALIZE.save(_G.USER, fname)
+		if DEBUG then
+			user_log("!!!!!!!!!!! Uživatel použil funkci DEBUG. !!!!!!!!!!")
+		end
 		_G.HTML = {
 			home = function(txt)
 				local id = USER.id
