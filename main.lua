@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
-_G.VERZE = ([[*<= Version '20181004a' =>*]]):match("'(.*)'")
+_G.VERZE = ([[*<= Version '20181116a' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
