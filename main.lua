@@ -143,48 +143,6 @@ local function zavorka(c1)
 	return obj
 end
 
-local function plus(c1, c2)
-	local r1, r2 = c1.render, c2.render
-	if r2:match("^%-") then
-		r2 = "("..r2..")"
-	end
-	local render = r1 .. " + " .. r2
-	local obj = {typ = "plus", render = render, c1=c1, c2=c2}
-	return obj
-end
-
-local function minus(c1, c2)
-	if c2.typ == "plus" or c2.typ == "minus" then
-		c2 = zavorka(c2)
-	end
-	local r1, r2 = c1.render, c2.render
-	if r2:match("^%-") then
-		r2 = "("..r2..")"
-	end
-	local render = r1 .. " - " .. r2
-	local obj = {typ = "minus", render = render, c1=c1, c2=c2}
-	return obj
-end
-
-local function krat(c1, c2)
-	if c1.typ == "plus" or c1.typ == "minus" then
-		c1 = zavorka(c1)
-	end
-	if c2.typ == "plus" or c2.typ == "minus" then
-		c2 = zavorka(c2)
-	end
-	local render = c1.render .. " \\cdot " .. c2.render
-	local obj = {typ = "krat", render = render, c1 = c1, c2 = c2}
-	return obj
-end
-
-local function lomeno (c1, c2)
-	local render = string.format("\\frac{%s}{%s}", c1.render, c2.render)
-	local obj = {typ = "lomeno", render = render, c1=c1, c2=c2}
-	return obj
-
-end
-
 local function vypocti(obj)
 	local typ = assert(obj.typ)
 	FFTEMPL.log("pocitam: "..typ)
@@ -193,6 +151,19 @@ local function vypocti(obj)
 	end
 	if typ == "zavorka" then
 		return vypocti(obj.obsah)
+	end
+	if typ == "mocnina" then
+		local mocnitel = assert(obj.mocnitel)
+		if not (mocnitel == math.floor(mocnitel) and mocnitel >= 2 and mocnitel <= 5) then
+			error ("Nepripustny mocnitel: "..mocnitel)
+		end
+		local mocnenec = vypocti(obj.c)
+		local res = {c=1, j=1}
+		for i = 1, mocnitel do
+			res.c = res.c * mocnenec.hodnota.citatel
+			res.j = res.j * mocnenec.hodnota.jmenovatel
+		end
+		return cislo(nil, res.c, res.j)
 	end
 	if typ == "krat" then
 		local c1, c2 = vypocti(obj.c1), vypocti(obj.c2)
@@ -222,6 +193,60 @@ local function vypocti(obj)
 		return cislo(nil, cit, jm)
 	end
 end
+
+local all_operators = {
+	plus = function(c1, c2)
+		local r1, r2 = c1.render, c2.render
+		if r2:match("^%-") then
+			r2 = "("..r2..")"
+		end
+		local render = r1 .. " + " .. r2
+		local obj = {typ = "plus", render = render, c1=c1, c2=c2}
+		return obj
+	end,
+
+	minus = function (c1, c2)
+		if c2.typ == "plus" or c2.typ == "minus" then
+			c2 = zavorka(c2)
+		end
+		local r1, r2 = c1.render, c2.render
+		if r2:match("^%-") then
+			r2 = "("..r2..")"
+		end
+		local render = r1 .. " - " .. r2
+		local obj = {typ = "minus", render = render, c1=c1, c2=c2}
+		return obj
+	end,
+
+	krat = function (c1, c2)
+		if c1.typ == "plus" or c1.typ == "minus" then
+			c1 = zavorka(c1)
+		end
+		if c2.typ == "plus" or c2.typ == "minus" then
+			c2 = zavorka(c2)
+		end
+		local render = c1.render .. " \\cdot " .. c2.render
+		local obj = {typ = "krat", render = render, c1 = c1, c2 = c2}
+		return obj
+	end,
+
+	lomeno = function (c1, c2)
+		local render = string.format("\\frac{%s}{%s}", c1.render, c2.render)
+		local obj = {typ = "lomeno", render = render, c1=c1, c2=c2}
+		return obj
+	end,
+
+	mocnina = function (c, mocnitel)
+		local x1 = c.render
+		if x1 ~= tostring(vypocti(c).hodnota.citatel) then
+			x1 = "("..x1..")"
+		end
+
+		local render = string.format('%s^%s', x1, mocnitel)
+		local obj = {typ = "mocnina", render = render, c = c, mocnitel = mocnitel}
+		return obj
+	end,
+} -- konec all_operators
 
 local function zakladni_tvar(c)
 	assert(c.typ == "cislo")
@@ -314,18 +339,23 @@ local function priklad(diff, seed)
 		error("WTF")
 	end
 
-	local all_ops = {plus, minus, krat, lomeno}
-	local function operator()
+	local op_scores = {plus = 1, minus = 1.5, krat = 2, lomeno = 2}
+	local all_ops = {}
+	for k, v in pairs(op_scores) do
+		table.insert(all_ops, k)
+	end
+	
+	local function rnd_operator()
 		return all_ops[rnd(#all_ops)]
 	end
 
 	local remdif = math.floor(diff * 5 + 4)
 	local ops = {}
 	assert(remdif > 0 and remdif < 20)
-	local op_scores = {[plus] = 1, [minus] = 1.5, [krat] = 2, [lomeno] = 2}
+	local op_scores = {plus = 1, minus = 1.5, krat = 2, lomeno = 2}
 	while remdif > 0 do
-		local op = operator()
-		remdif = remdif - op_scores[op]
+		local op = rnd_operator()
+		remdif = remdif - assert(op_scores[op], "Op = "..tostring(op))
 		table.insert(ops,op)
 	end
 	local vyrazy = {}
@@ -337,12 +367,26 @@ local function priklad(diff, seed)
 		end
 	end
 	for i, op in ipairs(ops) do
-		local c1 = table.remove(vyrazy, rnd(#vyrazy))
-		local c2 = table.remove(vyrazy, rnd(#vyrazy))
-		if op == lomeno and vypocti(c2).hodnota.citatel == 0 then
-			c2 = plus(c2, cislo(rnd(5)))
+		local c1 = assert(table.remove(vyrazy, rnd(#vyrazy)))
+		local c2 = assert(table.remove(vyrazy, rnd(#vyrazy)))
+		if op == "lomeno" and vypocti(c2).hodnota.citatel == 0 then
+			c2 = all_operators.plus(c2, cislo(rnd(5)))
 		end
-		table.insert(vyrazy, op(c1, c2))
+		local res = all_operators[op](c1, c2)
+		
+		--mocnina?
+		if rnd() < 0.3 + diff / 3 then
+			local mocnitel = rnd(4) + 1
+			local v = vypocti(res)
+			local max = 1000
+			if math.abs(v.hodnota.citatel) ^ mocnitel <= max and math.abs(v.hodnota.jmenovatel) ^ mocnitel <= max then
+				res = all_operators.mocnina(res, mocnitel)
+				extradif = extradif + mocnitel / 5
+			end
+		end
+
+		assert(res)
+		table.insert(vyrazy, res)
 	end
 	assert(#vyrazy == 1)
 	local res = {zadani = assert(vyrazy[1]), obtiznost = extradif + diff, seed = seed}
@@ -350,7 +394,7 @@ local function priklad(diff, seed)
 	if not res.zadani.render:match("frac") then
 		res.body = math.floor(res.body / 2)
 	end
-	res.id = os.date("%m%d_%H%M_")..HASH_RANDOM.random_string(rnd, 4)
+	res.id = HASH_RANDOM.random_string(rnd, 6)..os.date("_%m%d_%H%M")
 	local r = vypocti(res.zadani)
 	local x,y,z, float = zakladni_tvar(r)
 	local reseni = {x=x, y=y, z=z, float = float, tex = zakladni_tvar_tex(r), objekt = r}
