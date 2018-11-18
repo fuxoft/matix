@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
-_G.VERZE = ([[*<= Version '20181116b' =>*]]):match("'(.*)'")
+_G.VERZE = ([[*<= Version '20181118a' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -376,12 +376,14 @@ local function priklad(diff, seed)
 		
 		--mocnina?
 		if rnd() < 0.3 + diff / 3 then
-			local mocnitel = rnd(4) + 1
+			local mocnitel = rnd(3) + 1
 			local v = vypocti(res)
 			local max = 1000
-			if math.abs(v.hodnota.citatel) ^ mocnitel <= max and math.abs(v.hodnota.jmenovatel) ^ mocnitel <= max then
+			local m1, m2 = math.abs(v.hodnota.citatel), math.abs(v.hodnota.jmenovatel)
+			local diff = m1 ^ mocnitel + m2 ^ mocnitel
+			if diff <= max then
 				res = all_operators.mocnina(res, mocnitel)
-				extradif = extradif + mocnitel / 5
+				extradif = extradif + diff / max * 0.4
 			end
 		end
 
