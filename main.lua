@@ -1,6 +1,6 @@
 --MATIX
 --fuka@fuxoft.cz
-_G.VERZE = ([[*<= Version '20181118a' =>*]]):match("'(.*)'")
+_G.VERZE = ([[*<= Version '20181118b' =>*]]):match("'(.*)'")
 local function mkdir(str)
 	os.execute("mkdir "..str)
 end
@@ -780,7 +780,7 @@ local function main()
 	add(" / Dnes jsi získal (b)"..dnesni_body().."(/b) bodů")
 	if not USER.priklady then
 		USER.priklady = {}
-		local prikladu, diffstep = 10, 0.05
+		local prikladu, diffstep = 10, 0.02
 		for i = 1, prikladu do
 			local pr = priklad(USER.obtiznost + (i-1)*diffstep)
 			table.insert(USER.priklady, pr)
